@@ -3,21 +3,31 @@ import argparse, datetime, shutil, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from common import ROOT, load_config, read_json, write_json, run
-import script_gen, tts, visuals, subtitles, render, textimg
+import script_gen, tts, visuals, subtitles, render, textimg, db, telegram_api
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true", help="بدون مفاتيح: سيناريو تجريبي وصوت صامت ولا رفع")
     ap.add_argument("--no-upload", action="store_true")
+    ap.add_argument("--sample", action="store_true", help="سيناريو العينة بلا Claude، مع صوت حقيقي وبوابة المراجعة")
+    ap.add_argument("--upload-now", action="store_true", help="رفع فوري بلا مراجعة؛ يتطلب publish_enabled=true")
     ap.add_argument("--topic")
     ap.add_argument("--privacy", choices=["private", "public", "scheduled"])
     a = ap.parse_args()
     cfg = load_config()
+    _env = ROOT / ".env"
+    if _env.exists():                                            # يحمّل أسرار .env المحلية دون طباعتها
+        import os
+        for _l in _env.read_text(encoding="utf-8").splitlines():
+            if "=" in _l and not _l.lstrip().startswith("#"):
+                _k, _v = _l.split("=", 1); os.environ.setdefault(_k.strip(), _v.split("#")[0].strip())
+    con = db.connect(); db.import_published(con=con)
+    if db.flag("paused", con): print("الإنتاج موقوف (paused). /resume في Telegram أو db.set_setting."); return
     if a.privacy: cfg["publish"]["privacy"] = a.privacy
 
     topics = read_json(ROOT / "topics.json", {"queue": [], "niche": ""})
     state = read_json(ROOT / "state" / "published.json", {"videos": []})
-    history = [v["topic"] for v in state["videos"]]
+    history = [v["topic"] for v in state["videos"]] + [r["topic"] for r in con.execute("SELECT topic FROM videos WHERE topic IS NOT NULL")]
 
     stamp = datetime.date.today().isoformat()
     work = ROOT / "output" / stamp
@@ -26,8 +36,8 @@ def main():
 
     # 1) السيناريو
     from_queue = False
-    if a.dry_run:
-        meta = read_json(ROOT / "samples" / "sample_script.json", None); topic = "dry-run"
+    if a.dry_run or a.sample:
+        meta = read_json(ROOT / "samples" / "sample_script.json", None); topic = "dry-run" if a.dry_run else "sample"
     else:
         topic, from_queue = (a.topic, False) if a.topic else script_gen.next_topic(topics, history)
         print(f"الموضوع: {topic}")
@@ -84,14 +94,23 @@ def main():
     if a.dry_run or a.no_upload:
         print("لا رفع (dry-run/no-upload). راجع مجلد", work); return
 
-    # 6) رفع
-    import upload
-    vid = upload.upload(final, thumb, meta, cfg)
-    print(f"✅ https://youtu.be/{vid}")
-    state["videos"].append({"date": stamp, "topic": topic, "title": meta["title"], "id": vid})
-    write_json(ROOT / "state" / "published.json", state)
+    # 6) بوابة المراجعة: لا رفع قبل موافقتك (Telegram) إلا بـ --upload-now مع publish_enabled
+    import time as _t, subprocess as _sp, json as _j
+    write_json(work / "upload_meta.json", meta)
+    preview = work / "preview480.mp4"
+    run(["ffmpeg", "-y", "-i", str(final), "-vf", "scale=-2:480", "-c:v", "libx264", "-crf", "30", "-preset", "fast",
+         "-c:a", "aac", "-b:a", "96k", str(preview)])
+    cur = con.execute("INSERT INTO videos(topic,title,stage,workdir,created_at,updated_at) VALUES(?,?,?,?,?,?)",
+                      (topic, meta["title"], "review", str(work), _t.time(), _t.time()))
+    vid = cur.lastrowid
     if from_queue:
         topics["queue"].pop(0); write_json(ROOT / "topics.json", topics)
+    db.log("render", f"جاهز للمراجعة #{vid}: {meta['title']}", vid, con)
+    if a.upload_now and db.flag("publish_enabled", con):
+        import publish; print("✅ https://youtu.be/" + publish.upload_approved(vid, con)); return
+    sent = telegram_api.send_review(vid, meta["title"], meta["description"], thumb, preview, con)
+    print(f"جاهز للمراجعة #{vid}: {work}\n" + ("أُرسل إلى Telegram." if sent else
+          "لم يُرسل (Telegram غير مضبوط بعد). راجع الملفات ثم شغّل البوت."))
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,6 @@
+# تبعيات التشغيل المحلي على ويندوز (بعد تثبيت torch/torchaudio بنسخة CUDA يدوياً، ثم silma-tts --no-deps)
+-r requirements.txt
+-r scripts/phase1/requirements-silma-win.txt
+faster-whisper
+av>=14,<17
+jiwer
