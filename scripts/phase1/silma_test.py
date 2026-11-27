@@ -18,17 +18,26 @@ def main():
     ap.add_argument("--nfe", type=int, default=16, help="خطوات التوليد: أعلى = أجود وأبطأ")
     a = ap.parse_args()
     import torch
+    # 1) بديل nemo_text_processing (pynini لا تُبنى على ويندوز)
+    shim = str(Path(__file__).parent / "shims")
+    if shim not in sys.path: sys.path.insert(0, shim)
+    # 2) قراءة الصوت عبر soundfile بدل torchcodec (يتطلب DLLs لـ ffmpeg على ويندوز)
+    import soundfile as sf, torchaudio
+    def _load(path, *args, **kw):
+        data, sr = sf.read(str(path), dtype="float32", always_2d=True)
+        return torch.from_numpy(data.T.copy()), sr
+    torchaudio.load = _load
     dev = a.device or ("cuda" if torch.cuda.is_available() else "cpu")
     print("الجهاز:", dev, torch.cuda.get_device_name(0) if dev == "cuda" else "")
     from silma_tts.api import SilmaTTS
-    t0 = time.time(); m = SilmaTTS(device=dev); load = time.time() - t0
+    t0 = time.time(); m = SilmaTTS(device=dev, enable_normalizer=False); load = time.time() - t0
     OUT.mkdir(parents=True, exist_ok=True); rows = []
     for name, (_, spoken) in SAMPLES.items():
         if a.only and name != a.only: continue
         # لا نحوّل الأسماء الإنجليزية إلى عربية هنا: النموذج ثنائي اللغة. نستعمل النص كما يظهر في الترجمة
         text = SAMPLES[name][0]
         out = OUT / f"silma_{name}.wav"; t0 = time.time()
-        m.infer(ref_file=a.ref, ref_text=a.ref_text, gen_text=text, file_wave=str(out), seed=1, nfe_step=a.nfe)
+        m.infer(ref_file=a.ref, ref_text=a.ref_text, gen_text=text, file_wave=str(out), seed=1, nfe_step=a.nfe, normalize_numbers=False)
         dt = time.time() - t0
         with wave.open(str(out)) as w: d = w.getnframes() / w.getframerate()
         rows.append(dict(sample=name, file=out.name, audio_sec=round(d, 1), gen_sec=round(dt, 1), rtf=round(dt / d, 2)))

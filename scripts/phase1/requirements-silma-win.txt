@@ -1,0 +1,21 @@
+# تبعيات SILMA بدون nemo_text_processing/pynini (لا تُبنى على ويندوز) وبدون gradio/torchcodec
+cached_path
+catt_tashkeel
+ema_pytorch
+hydra-core
+librosa
+matplotlib
+numpy
+omegaconf
+pydub
+safetensors
+soundfile
+torchdiffeq
+tqdm
+transformers
+transformers_stream_generator
+unidecode
+vocos
+x_transformers
+huggingface_hub
+pyyaml
