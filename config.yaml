@@ -53,7 +53,7 @@ publish:
   # scheduled = يُرفع مجدولاً على publish_hour_utc
   privacy: private
   publish_hour_utc: 15    # 15:00 UTC = 18:00 مكة/الرياض
-  contains_synthetic_media: true   # إفصاح يوتيوب عن المحتوى المُنتَج بالذكاء الاصطناعي
+  contains_synthetic_media: false  # الصوت صوتك الحقيقي والمرئيات رسوم/ستوك؛ اجعلها true إن استعملت صوتاً أو مشاهد واقعية مولّدة
   default_tags: ["الذكاء الاصطناعي", "AI", "التقنية", "TECH4U"]
 
 recorder:

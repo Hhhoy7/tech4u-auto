@@ -1,0 +1,11 @@
+pillow
+arabic-reshaper
+python-bidi
+pyyaml
+requests
+faster-whisper
+av>=14,<17
+anthropic
+google-api-python-client
+google-auth
+google-auth-oauthlib

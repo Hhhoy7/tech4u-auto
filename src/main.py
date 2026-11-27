@@ -25,7 +25,9 @@ def prepare(a, cfg, con):
     state = read_json(ROOT / "state" / "published.json", {"videos": []})
     history = [v["topic"] for v in state["videos"]] + [r["topic"] for r in con.execute("SELECT topic FROM videos WHERE topic IS NOT NULL")]
     from_queue = False
-    if a.dry_run or a.sample:
+    if a.script:                                    # سيناريو جاهز (مكتوب مسبقاً): لا استدعاء لـ Claude
+        meta = read_json(Path(a.script), None); topic = meta.get("topic") or meta["title"]
+    elif a.dry_run or a.sample:
         meta = read_json(ROOT / "samples" / "sample_script.json", None); topic = "dry-run" if a.dry_run else "sample"
     else:
         topic, from_queue = (a.topic, False) if a.topic else script_gen.next_topic(topics, history)
@@ -117,6 +119,7 @@ def main():
     ap.add_argument("--sample", action="store_true", help="سيناريو العينة بلا Claude")
     ap.add_argument("--upload-now", action="store_true", help="رفع فوري بلا مراجعة؛ يتطلب publish_enabled=true")
     ap.add_argument("--render", type=int, metavar="ID", help="مونتاج فيديو سُجّلت مشاهده")
+    ap.add_argument("--script", metavar="FILE", help="استعمل سيناريو JSON جاهزاً بدل Claude")
     ap.add_argument("--topic")
     ap.add_argument("--privacy", choices=["private", "public", "scheduled"])
     a = ap.parse_args()
