@@ -1,0 +1,23 @@
+# n8n Community محلي (مجاني). يعمل على جهازك فقط: http://localhost:5678
+# التشغيل:  docker compose up -d      الإيقاف:  docker compose stop      الحذف (مع البيانات!):  docker compose down -v
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:stable
+    container_name: tech4u-n8n
+    restart: unless-stopped            # يعود تلقائياً عند تشغيل Docker/الجهاز
+    ports:
+      - "127.0.0.1:5678:5678"          # مقصور على جهازك، غير مكشوف للشبكة
+    environment:
+      - GENERIC_TIMEZONE=Asia/Baghdad
+      - TZ=Asia/Baghdad
+      - N8N_SECURE_COOKIE=false        # لأننا نستعمل http محلياً
+      - N8N_DIAGNOSTICS_ENABLED=false  # بلا تيليمتري
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - N8N_PERSONALIZATION_ENABLED=false
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:?ضع N8N_ENCRYPTION_KEY في ملف .env}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # ليستدعي n8n خدمة بايثون المحلية
+    volumes:
+      - n8n_data:/home/node/.n8n
+volumes:
+  n8n_data:
