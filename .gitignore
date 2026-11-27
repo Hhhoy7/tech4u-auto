@@ -4,3 +4,4 @@ state/stock_cache/
 __pycache__/
 client_secret*.json
 .env
+state/models/
