@@ -1,0 +1,36 @@
+channel:
+  name: TECH4U
+  language: ar            # لغة الفيديو
+  category_id: "28"       # Science & Technology
+  tagline: "تقنية تهمك"
+
+video:
+  target_minutes: 8       # مدة الفيديو التقريبية
+  width: 1920
+  height: 1080
+  fps: 30
+
+voice:
+  provider: elevenlabs
+  voice_id: "7N1xLmvR6jQolMXWRhvT"   # Arafat Almnshid (عراقي، ElevenLabs)
+  model_id: eleven_multilingual_v2
+  stability: 0.5
+  similarity_boost: 0.8
+  style: 0.25
+
+llm:
+  model: claude-sonnet-5-5
+
+visuals:
+  provider: auto          # Pexels إن وُجد مفتاحه، وإلا Pixabay، وإلا بطاقات مولّدة
+  music_file: ""          # اختياري: مسار موسيقى خلفية (مرخّصة) مثل assets/music.mp3
+  music_volume: 0.08
+
+publish:
+  # private  = يُرفع خاصاً لتراجعه أنت (موصى به في البداية)
+  # public   = ينشر فوراً
+  # scheduled = يُرفع مجدولاً على publish_hour_utc
+  privacy: private
+  publish_hour_utc: 15    # 15:00 UTC = 18:00 مكة/الرياض
+  contains_synthetic_media: true   # إفصاح يوتيوب عن المحتوى المُنتَج بالذكاء الاصطناعي
+  default_tags: ["الذكاء الاصطناعي", "AI", "التقنية", "TECH4U"]

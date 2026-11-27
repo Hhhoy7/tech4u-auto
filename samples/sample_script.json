@@ -1,0 +1,12 @@
+{
+  "title": "عنوان تجريبي: أدوات ذكاء اصطناعي",
+  "thumbnail_text": "7 أدوات AI ستغيّر حياتك!",
+  "description": "وصف تجريبي.",
+  "tags": ["AI"],
+  "scenes": [
+    {"narration": "ماذا لو كان هناك مساعد لا ينام، يكتب ويبحث ويصمم نيابةً عنك؟ في هذا الفيديو نستعرض سبع أدوات ذكاء اصطناعي قد تغيّر طريقة عملك.", "on_screen_text": "TECH4U", "stock_query": "futuristic technology", "chapter": "المقدمة"},
+    {"narration": "الأداة الأولى هي ChatGPT، وهي مساعد للكتابة والتحليل وتنظيم الأفكار وإنجاز المهام اليومية.", "on_screen_text": "الأداة 1: ChatGPT", "stock_query": "typing laptop", "chapter": "ChatGPT"},
+    {"narration": "أما الأداة الثانية فهي Claude، وتتميّز بتحليل الملفات الطويلة والمساعدة في البرمجة وكتابة المحتوى.", "on_screen_text": "الأداة 2: Claude", "stock_query": "programmer code", "chapter": "Claude"},
+    {"narration": "وفي الخاتمة، اختر الأداة بحسب حاجتك، واشترك في القناة لتصلك الفيديوهات القادمة.", "on_screen_text": "الخلاصة", "stock_query": "city night", "chapter": "الخاتمة"}
+  ]
+}

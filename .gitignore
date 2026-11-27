@@ -1,0 +1,6 @@
+output/
+state/stock_cache/
+*.pyc
+__pycache__/
+client_secret*.json
+.env

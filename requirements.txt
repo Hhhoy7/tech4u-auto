@@ -1,0 +1,9 @@
+anthropic>=0.40
+requests
+pillow
+arabic-reshaper
+python-bidi
+pyyaml
+google-api-python-client
+google-auth
+google-auth-oauthlib
