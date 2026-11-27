@@ -1,7 +1,8 @@
 name: daily-video
 on:
-  schedule:
-    - cron: "0 9 * * *"     # يومياً 09:00 UTC (12:00 بتوقيت مكة)؛ الرفع يستغرق وقتاً ثم يُجدوِل النشر
+  # الجدول اليومي معطّل عمداً (ميزانية صفرية، والتشغيل محلي). أعد تفعيله بموافقتك فقط:
+  # schedule:
+  #   - cron: "0 9 * * *"
   workflow_dispatch:
 permissions:
   contents: write

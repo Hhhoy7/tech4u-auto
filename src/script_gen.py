@@ -2,6 +2,7 @@
 import json, re, datetime
 import anthropic
 from common import env
+import budget
 
 SYSTEM = """أنت كاتب سيناريو لقناة يوتيوب عربية تقنية اسمها TECH4U بأسلوب وثائقي سينمائي واثق.
 القواعد:
@@ -32,8 +33,8 @@ def generate(topic, cfg, history):
  ]
 }}
 المشهد الأول فصله "المقدمة"."""
-    msg = client.messages.create(model=cfg["llm"]["model"], max_tokens=16000,
-                                 system=SYSTEM, messages=[{"role": "user", "content": prompt}])
+    msg = budget.guarded_create(client, purpose="script", model=cfg["llm"]["model"], max_tokens=16000,
+                                system=SYSTEM, messages=[{"role": "user", "content": prompt}])
     text = "".join(b.text for b in msg.content if b.type == "text")
     m = re.search(r"\{.*\}", text, re.S)
     data = json.loads(m.group(0))
@@ -44,8 +45,8 @@ def next_topic(cfg_topics, history):
     if cfg_topics["queue"]:
         return cfg_topics["queue"][0], True
     client = anthropic.Anthropic(api_key=env("ANTHROPIC_API_KEY"))
-    msg = client.messages.create(
-        model=load_model(), max_tokens=400,
+    msg = budget.guarded_create(
+        client, purpose="topic", model=load_model(), max_tokens=400,
         messages=[{"role": "user", "content":
             f"اقترح موضوع فيديو واحداً جديداً لقناة TECH4U في مجال: {cfg_topics['niche']}.\n"
             f"تاريخ اليوم {datetime.date.today().isoformat()}. يجب أن يكون الموضوع صالحاً ولا يعتمد على أخبار لا تستطيع التحقق منها.\n"

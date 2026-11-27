@@ -11,7 +11,9 @@ video:
   fps: 30
 
 voice:
-  provider: elevenlabs
+  # provider: local = صوت محلي مجاني (يُعتمد بعد اختبار سماعي). elevenlabs محفوظ كخيار مستقبلي فقط
+  # (خطتك المجانية لا تسمح بالاستخدام التجاري ولا بأصوات المكتبة عبر API).
+  provider: local
   voice_id: "7N1xLmvR6jQolMXWRhvT"   # Arafat Almnshid (عراقي، ElevenLabs)
   model_id: eleven_multilingual_v2
   stability: 0.5
@@ -20,6 +22,16 @@ voice:
 
 llm:
   model: claude-sonnet-5-5
+
+# حارس رصيد Claude (الرصيد الكلي 5$). لا يعمل أي استدعاء قبل: تثبيت الأسعار الرسمية + تفعيلك أنت.
+budget:
+  total_usd: 5.00
+  hard_cap_usd: 4.00       # سقف صلب؛ يبقى 1$ احتياطاً
+  warn_usd: 3.00
+  tokens_per_char_upper: 0.7   # تقدير محلي متحفظ للعربية (بلا اتصال شبكة)
+  pricing_verified: false      # اجعلها true بعد نسخ الأسعار من الصفحة الرسمية
+  pricing:                     # دولار لكل مليون توكن
+    claude-sonnet-5-5: {input: null, output: null}
 
 visuals:
   provider: auto          # Pexels إن وُجد مفتاحه، وإلا Pixabay، وإلا بطاقات مولّدة

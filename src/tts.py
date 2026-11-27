@@ -13,6 +13,8 @@ def synth(text, out_mp3, cfg, dry_run=False):
         return [(w, i * step, (i + 1) * step) for i, w in enumerate(words_txt)]
 
     v = cfg["voice"]
+    if v.get("provider", "elevenlabs") != "elevenlabs":
+        raise SystemExit("الصوت المحلي لم يُنفَّذ بعد (المرحلة التالية). لا يُستدعى ElevenLabs تلقائياً. جرّب --dry-run")
     voice_id = v["voice_id"] or env("ELEVENLABS_VOICE_ID")
     r = requests.post(
         f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps",
