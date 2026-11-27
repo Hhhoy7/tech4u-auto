@@ -15,16 +15,20 @@ jobs:
         with: { python-version: "3.12" }
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: pip install -r requirements.txt && bash scripts/get_fonts.sh
-      - name: Produce and upload
+      - name: Load keys
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
-          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+        run: |
+          # كل المفاتيح في سر واحد: أسطر بصيغة NAME=value (تقبل مسافات وCRLF)
+          printf '%s\n' "$ENV_FILE" | tr -d '\r' | while IFS= read -r line; do
+            case "$line" in *=*) ;; *) continue;; esac
+            name=$(printf '%s' "${line%%=*}" | tr -d ' \t')
+            val=$(printf '%s' "${line#*=}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            [ -z "$name" ] || [ -z "$val" ] && continue
+            echo "::add-mask::$val"
+            echo "$name=$val" >> "$GITHUB_ENV"
+          done
+      - name: Produce and upload
         run: python src/main.py
       - name: Save state
         run: |
