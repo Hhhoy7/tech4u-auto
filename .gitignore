@@ -6,3 +6,4 @@ client_secret*.json
 .env
 state/models/
 state/tech4u.db*
+assets/voice_ref/

@@ -14,6 +14,10 @@ voice:
   # provider: local = صوت محلي مجاني (يُعتمد بعد اختبار سماعي). elevenlabs محفوظ كخيار مستقبلي فقط
   # (خطتك المجانية لا تسمح بالاستخدام التجاري ولا بأصوات المكتبة عبر API).
   provider: local
+  local:
+    engine: silma          # SILMA TTS (Apache-2.0)؛ يُفعَّل في مرحلة تنفيذ TTS
+    ref_audio: assets/voice_ref/ref.wav       # تسجيلك الشخصي، مستثنى من git ولا يُرفع لأي خدمة
+    ref_text_file: assets/voice_ref/ref.txt
   voice_id: "7N1xLmvR6jQolMXWRhvT"   # Arafat Almnshid (عراقي، ElevenLabs)
   model_id: eleven_multilingual_v2
   stability: 0.5
