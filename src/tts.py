@@ -1,6 +1,7 @@
 """تعليق صوتي عبر ElevenLabs مع توقيت كل كلمة (للترجمة المتزامنة)."""
 import base64, requests, subprocess
-from common import env, run
+from pathlib import Path
+from common import env, run, duration
 
 def synth(text, out_mp3, cfg, dry_run=False):
     """يعيد قائمة (كلمة، بداية، نهاية) بالثواني."""
@@ -13,6 +14,11 @@ def synth(text, out_mp3, cfg, dry_run=False):
         return [(w, i * step, (i + 1) * step) for i, w in enumerate(words_txt)]
 
     v = cfg["voice"]
+    if v.get("provider") == "recorded":     # تسجيلك الشخصي من المسجّل المحلي: الملف موجود أصلاً
+        import silma_backend
+        if not Path(out_mp3).exists(): raise SystemExit(f"لا تسجيل للمشهد: {out_mp3}")
+        return silma_backend.align_words(out_mp3, text, cfg) or silma_backend.spread_words(
+            text.split(), 0.0, duration(out_mp3))
     if v.get("provider") == "local":
         import silma_backend
         return silma_backend.synth(text, out_mp3, cfg)
