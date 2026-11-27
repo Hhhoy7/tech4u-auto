@@ -15,7 +15,7 @@ def main():
     ap.add_argument("--ref", required=True); ap.add_argument("--ref-text", required=True)
     ap.add_argument("--device", default=None, help="cuda أو cpu (الافتراضي: تلقائي)")
     ap.add_argument("--only", choices=list(SAMPLES), default=None)
-    ap.add_argument("--nfe", type=int, default=16, help="خطوات التوليد: أعلى = أجود وأبطأ")
+    ap.add_argument("--nfe", type=int, default=32, help="خطوات التوليد: أعلى = أجود وأبطأ (32 = إعداد D المعتمد مؤقتاً)")
     a = ap.parse_args()
     import torch
     # 1) بديل nemo_text_processing (pynini لا تُبنى على ويندوز)
@@ -37,7 +37,7 @@ def main():
         # لا نحوّل الأسماء الإنجليزية إلى عربية هنا: النموذج ثنائي اللغة. نستعمل النص كما يظهر في الترجمة
         text = SAMPLES[name][0]
         out = OUT / f"silma_{name}.wav"; t0 = time.time()
-        m.infer(ref_file=a.ref, ref_text=a.ref_text, gen_text=text, file_wave=str(out), seed=1, nfe_step=a.nfe, normalize_numbers=False)
+        m.infer(ref_file=a.ref, ref_text=a.ref_text, gen_text=text, file_wave=str(out), seed=1, nfe_step=a.nfe, normalize_numbers=False, force_tashkeel=False)
         dt = time.time() - t0
         with wave.open(str(out)) as w: d = w.getnframes() / w.getframerate()
         rows.append(dict(sample=name, file=out.name, audio_sec=round(d, 1), gen_sec=round(dt, 1), rtf=round(dt / d, 2)))

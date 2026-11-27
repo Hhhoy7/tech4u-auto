@@ -18,6 +18,9 @@ voice:
     engine: silma          # SILMA TTS (Apache-2.0)؛ يُفعَّل في مرحلة تنفيذ TTS
     ref_audio: assets/voice_ref/ref.wav       # تسجيلك الشخصي، مستثنى من git ولا يُرفع لأي خدمة
     ref_text_file: assets/voice_ref/ref.txt
+    force_tashkeel: false   # اختيار المالك بعد المقارنة (الإعداد D): بلا تشكيل آلي
+    nfe_step: 32            # جودة أعلى وضعف الزمن؛ يُقاس زمنها على GTX 1650
+    status: provisional     # مقبول مؤقتاً ("ممكن")؛ يُعاد التقييم بعد الفيديو التجريبي
   voice_id: "7N1xLmvR6jQolMXWRhvT"   # Arafat Almnshid (عراقي، ElevenLabs)
   model_id: eleven_multilingual_v2
   stability: 0.5
